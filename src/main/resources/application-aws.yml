@@ -1,0 +1,68 @@
+server:
+  port: 9121
+#  env: ${aws.ps.server.env}
+spring:
+  #  profiles:
+  #    active: aws
+  application:
+    name: DntService
+  datasource:
+    url: ${aws.ps.datasource.url.campv2.service}
+    username: ${aws.ps.datasource.username}
+    password: ${aws.ps.datasource.password}
+    driver: org.mariadb.jdbc.Driver
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_ADDR}
+        namespace: ${NACOS_NAMESPACE_MCE}
+        enabled: true
+      config:
+        enabled: false
+        server-addr: ${NACOS_ADDR}
+        import-check: false
+        namespace: ${NACOS_NAMESPACE_MCE}
+  autoconfigure:
+    exclude: org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationAutoConfiguration,org.springframework.cloud.client.serviceregistry.ServiceRegistryAutoConfiguration
+
+
+feign:
+  client:
+    default:
+      #这里时间一定要调长，否则feign客户端会报ReadTimeOut  服务端报Error parsing HTTP request header
+      connectTimeout: 30000
+      readTimeout: 30000
+      loggerLevel: basic
+
+ribbon:
+  ReadTimeout: 60000
+  ConnectTimeout: 60000
+
+#开放所有页面节点  默认只开启了health、info两个节点
+management:
+  endpoint:
+    health:
+      enabled: false
+      show-details: always
+    metrics:
+      enabled: true
+    loggers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+    enabled-by-default: false
+
+mybatis:
+  type-aliases-package: sg.ctx.mpc.domain
+  mapper-locations:
+    - classpath*:sg/**/mapper/*.xml
+
+
+logging:
+  level:
+    root: INFO
+  config: classpath:logging-config-aws.xml
+
+
